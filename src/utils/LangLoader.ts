@@ -3,17 +3,24 @@ import en from '../lang/en.json';
 
 type LangKey = keyof typeof ko | keyof typeof en;
 
-
 const langs = {
   ko,
   en,
 } as const;
 
-let currentLang: keyof typeof langs = 'ko';
+type Lang = keyof typeof langs;
 
-export const setLang = (lang: keyof typeof langs) => {
+let currentLang: Lang = (localStorage.getItem('zentrix-lang') as Lang) || 'ko';
+
+export const setLang = (lang: Lang) => {
   currentLang = lang;
+  localStorage.setItem('zentrix-lang', lang);
+  window.dispatchEvent(new Event('languagechange'));
 };
+
+export const getCurrentLang = (): Lang => currentLang;
+
+export const getSupportedLangs = (): Lang[] => Object.keys(langs) as Lang[];
 
 export const t = (key: string): string => {
   const keys = key.split('.');

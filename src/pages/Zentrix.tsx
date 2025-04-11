@@ -23,6 +23,10 @@ export const Zentrix: React.FC = () => {
 
   const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const [selectedTool, setSelectedTool] = useState<string>('select');
+  const [lastAction, setLastAction] = useState<{
+    type: 'move' | 'rotate' | 'duplicate' | null;
+    payload?: any;
+  }>({ type: null });
 
   const handleComponentSelect = useCallback((componentId: string) => {
     const icon = getIconById(componentId);
@@ -59,18 +63,23 @@ export const Zentrix: React.FC = () => {
     switch (e.key) {
       case 'ArrowLeft':
         setDesign(prev => moveShape(prev, selectedShapeId, -10, 0));
+        setLastAction({ type: 'move', payload: { dx: -10, dy: 0 } });
         break;
       case 'ArrowRight':
         setDesign(prev => moveShape(prev, selectedShapeId, 10, 0));
+        setLastAction({ type: 'move', payload: { dx: 10, dy: 0 } });
         break;
       case 'ArrowUp':
         setDesign(prev => moveShape(prev, selectedShapeId, 0, -10));
+        setLastAction({ type: 'move', payload: { dx: 0, dy: -10 } });
         break;
       case 'ArrowDown':
         setDesign(prev => moveShape(prev, selectedShapeId, 0, 10));
+        setLastAction({ type: 'move', payload: { dx: 0, dy: 10 } });
         break;
       case 'r':
         setDesign(prev => rotateShape(prev, selectedShapeId, 45));
+        setLastAction({ type: 'rotate', payload: { angle: 45 } });
         break;
       case 'Delete':
       case 'Backspace':
@@ -100,6 +109,7 @@ export const Zentrix: React.FC = () => {
       ...prev,
       shapes: [...prev.shapes, newShape]
     }));
+    setLastAction({ type: 'duplicate' });
   }, [design.shapes]);
 
   const handleShapeRotate = useCallback((shapeId: string, angle: number) => {
@@ -210,6 +220,24 @@ export const Zentrix: React.FC = () => {
     console.log('SVG 내보내기 기능 준비 중...');
   }, []);
 
+  const handleRepeatLastAction = useCallback(() => {
+    if (!selectedShapeId || !lastAction.type) return;
+
+    switch (lastAction.type) {
+      case 'move':
+        const { dx, dy } = lastAction.payload;
+        setDesign(prev => moveShape(prev, selectedShapeId, dx, dy));
+        break;
+      case 'rotate':
+        const { angle } = lastAction.payload;
+        setDesign(prev => rotateShape(prev, selectedShapeId, angle));
+        break;
+      case 'duplicate':
+        handleShapeDuplicate(selectedShapeId);
+        break;
+    }
+  }, [selectedShapeId, lastAction, handleShapeDuplicate]);
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -266,6 +294,13 @@ export const Zentrix: React.FC = () => {
       { ctrl: true, shift: true }
     );
 
+    keyboardManager.registerCommand(
+      'y',
+      handleRepeatLastAction,
+      '마지막 작업 반복',
+      { ctrl: true }
+    );
+
     return () => {
       keyboardManager.unregisterCommand('d', { ctrl: true });
       keyboardManager.unregisterCommand('Delete');
@@ -274,8 +309,9 @@ export const Zentrix: React.FC = () => {
       keyboardManager.unregisterCommand('[', { shift: true });
       keyboardManager.unregisterCommand('g', { ctrl: true });
       keyboardManager.unregisterCommand('g', { ctrl: true, shift: true });
+      keyboardManager.unregisterCommand('y', { ctrl: true });
     };
-  }, [selectedShapeId, handleShapeDuplicate, handleShapeDelete, handleShapeRotate, handleLayerOrderChange, handleGroupShapes, handleUngroupShapes]);
+  }, [selectedShapeId, handleShapeDuplicate, handleShapeDelete, handleShapeRotate, handleLayerOrderChange, handleGroupShapes, handleUngroupShapes, handleRepeatLastAction]);
 
   return (
     <div className="fixed inset-0 bg-slate-900 flex flex-col">

@@ -6,10 +6,15 @@ export function withInitialization<P extends object>(
   WrappedComponent: React.ComponentType<P>
 ) {
   return function WithInitializationComponent(props: P) {
-    const { status } = useInit();
+    const { status, reinitialize } = useInit();
 
     if (!status.isInitialized) {
-      return <LoadingScreen error={status.error} />;
+      return (
+        <LoadingScreen
+          error={status.error}
+          onContinue={reinitialize}
+        />
+      );
     }
 
     return <WrappedComponent {...props} />;
