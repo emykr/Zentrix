@@ -1,76 +1,59 @@
-type KeyCommand = {
+interface KeyCommand {
   key: string;
+  description: string;
   ctrl?: boolean;
   shift?: boolean;
   alt?: boolean;
-  command: () => void;
-  description: string;
-};
+  handler: () => void;
+}
 
 class KeyboardManager {
-  private static instance: KeyboardManager;
   private commands: Map<string, KeyCommand> = new Map();
 
-  private constructor() {
+  constructor() {
     window.addEventListener('keydown', this.handleKeyDown.bind(this));
   }
 
-  static getInstance(): KeyboardManager {
-    if (!KeyboardManager.instance) {
-      KeyboardManager.instance = new KeyboardManager();
-    }
-    return KeyboardManager.instance;
-  }
-
-  private getCommandKey(e: KeyboardEvent): string {
-    const parts: string[] = [];
-    if (e.ctrlKey) parts.push('Ctrl');
-    if (e.shiftKey) parts.push('Shift');
-    if (e.altKey) parts.push('Alt');
-    parts.push(e.key.toLowerCase());
-    return parts.join('+');
-  }
-
-  private handleKeyDown(e: KeyboardEvent): void {
-    const commandKey = this.getCommandKey(e);
-    const command = this.commands.get(commandKey);
-    
-    if (command) {
-      e.preventDefault();
-      command.command();
-    }
+  private getCommandKey(key: string, modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean }): string {
+    return `${modifiers.ctrl ? 'ctrl+' : ''}${modifiers.shift ? 'shift+' : ''}${modifiers.alt ? 'alt+' : ''}${key}`;
   }
 
   registerCommand(
     key: string,
-    command: () => void,
+    handler: () => void,
     description: string,
     modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean } = {}
   ): void {
-    const parts: string[] = [];
-    if (modifiers.ctrl) parts.push('Ctrl');
-    if (modifiers.shift) parts.push('Shift');
-    if (modifiers.alt) parts.push('Alt');
-    parts.push(key.toLowerCase());
-    const commandKey = parts.join('+');
-
+    const commandKey = this.getCommandKey(key.toLowerCase(), modifiers);
     this.commands.set(commandKey, {
       key,
+      description,
       ...modifiers,
-      command,
-      description
+      handler
     });
   }
 
-  unregisterCommand(key: string, modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean } = {}): void {
-    const parts: string[] = [];
-    if (modifiers.ctrl) parts.push('Ctrl');
-    if (modifiers.shift) parts.push('Shift');
-    if (modifiers.alt) parts.push('Alt');
-    parts.push(key.toLowerCase());
-    const commandKey = parts.join('+');
-
+  unregisterCommand(
+    key: string,
+    modifiers: { ctrl?: boolean; shift?: boolean; alt?: boolean } = {}
+  ): void {
+    const commandKey = this.getCommandKey(key.toLowerCase(), modifiers);
     this.commands.delete(commandKey);
+  }
+
+  private handleKeyDown(event: KeyboardEvent): void {
+    const key = event.key.toLowerCase();
+    const commandKey = this.getCommandKey(key, {
+      ctrl: event.ctrlKey,
+      shift: event.shiftKey,
+      alt: event.altKey
+    });
+
+    const command = this.commands.get(commandKey);
+    if (command) {
+      event.preventDefault();
+      command.handler();
+    }
   }
 
   getRegisteredCommands(): KeyCommand[] {
@@ -78,5 +61,5 @@ class KeyboardManager {
   }
 }
 
-export const keyboardManager = KeyboardManager.getInstance();
+export const keyboardManager = new KeyboardManager();
 export type { KeyCommand };

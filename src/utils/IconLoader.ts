@@ -7,6 +7,7 @@ interface IconData {
 }
 
 export const icons: IconData[] = [
+  // 도형 카테고리
   {
     id: 'rectangle',
     title: '사각형',
@@ -26,20 +27,19 @@ export const icons: IconData[] = [
     </svg>`
   },
   {
-    id: 'layout-grid',
-    title: '그리드 레이아웃',
-    category: 'layout',
-    shortcut: 'G',
+    id: 'triangle',
+    title: '삼각형',
+    category: 'shape',
+    shortcut: 'T',
     svg: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M4 4h4v4H4V4zm6 0h4v4h-4V4zm6 0h4v4h-4V4zm-12 6h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zm-12 6h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4z" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 3L22 21H2L12 3Z" stroke="currentColor" stroke-width="2"/>
     </svg>`
-  }
-];
+  },
 
-export const getIconsByCategory = (category: IconData['category']): IconData[] => {
-  return icons.filter(icon => icon.category === category);
-};
-
-export const getIconById = (id: string): IconData | undefined => {
-  return icons.find(icon => icon.id === id);
+  // 도구 카테고리
+  {
+    id: 'select',
+    title: '선택',
+    category: 'tool',
+    shortcut: 'V',
 };
