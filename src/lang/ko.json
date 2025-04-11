@@ -1,0 +1,15 @@
+{
+  "button": {
+    "start": "시작하기",
+    "close": "닫기",
+    "retry": "다시 시도"
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "initialized": "초기화 완료"
+  },
+  "error": {
+    "initialization": "초기화 오류",
+    "unknown": "알 수 없는 오류가 발생했습니다"
+  }
+}

@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .ui-box {
+    @apply w-24 h-24 bg-slate-800 rounded-xl shadow-lg 
+           text-white flex items-center justify-center
+           transition-all duration-300 ease-in-out
+           cursor-pointer hover:scale-110 hover:bg-slate-700;
+  }
+
+  .ui-button {
+    @apply px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors;
+  }
+  
+  .ui-panel {
+    @apply bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20;
+  }
+
+  .ui-text {
+    @apply text-sm font-medium tracking-wide;
+  }
+
+  .ui-container {
+    @apply fixed inset-0 flex items-center justify-center;
+  }
+
+  .zentrix-canvas {
+    @apply bg-white rounded-lg shadow-lg;
+    image-rendering: pixelated;
+    touch-action: none;
+  }
+
+  .zentrix-container {
+    @apply flex items-center justify-center p-4 bg-slate-900 min-h-screen;
+  }
+
+  .component-panel {
+    @apply fixed left-0 top-0 h-screen w-64 bg-slate-900/95 backdrop-blur-md border-r border-white/10 p-4 overflow-y-auto;
+  }
+
+  .panel-section {
+    @apply mb-6;
+  }
+
+  .panel-title {
+    @apply text-white/70 text-sm font-medium mb-3;
+  }
+
+  .panel-grid {
+    @apply grid grid-cols-2 gap-2;
+  }
+
+  .component-button {
+    @apply flex flex-col items-center justify-center p-3 bg-slate-800/50 hover:bg-slate-700/50 
+           rounded-lg transition-colors text-white/90 hover:text-white;
+  }
+
+  .component-label {
+    @apply text-xs mt-2 font-medium;
+  }
+
+  .toolbar-container {
+    @apply fixed top-4 left-72 right-4 flex justify-center;
+  }
+
+  .toolbar-button {
+    @apply p-2 rounded-lg text-white/80 hover:text-white hover:bg-slate-700/50 transition-colors;
+  }
+
+  .toolbar-button.active {
+    @apply bg-blue-600 text-white;
+  }
+
+  .keyboard-shortcuts-panel {
+    @apply fixed right-4 bottom-4 bg-slate-800/95 backdrop-blur-sm 
+           rounded-lg border border-white/10 p-4 max-w-md;
+  }
+
+  .shortcuts-grid {
+    @apply mt-4 space-y-2;
+  }
+
+  .shortcut-item {
+    @apply flex items-center justify-between gap-4;
+  }
+
+  .shortcut-key {
+    @apply bg-slate-700 px-2 py-1 rounded text-xs text-white/90 font-mono whitespace-nowrap;
+  }
+
+  .shortcut-description {
+    @apply text-sm text-white/70;
+  }
+}

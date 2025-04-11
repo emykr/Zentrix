@@ -1,0 +1,15 @@
+{
+  "button": {
+    "start": "Start",
+    "close": "Close",
+    "retry": "Retry"
+  },
+  "common": {
+    "loading": "Loading...",
+    "initialized": "Initialization Complete"
+  },
+  "error": {
+    "initialization": "Initialization Error",
+    "unknown": "An unknown error occurred"
+  }
+}
