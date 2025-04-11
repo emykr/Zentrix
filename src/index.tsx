@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { ExamplePage } from '@pages/ExamplePage';
+import { Zentrix } from '@pages/Zentrix';
 import { InitProvider } from '@core/InitializationContext';
 import '@styles/ui.css';
 
@@ -8,7 +8,7 @@ const App: React.FC = () => {
   return (
     <React.StrictMode>
       <InitProvider>
-        <ExamplePage />
+        <Zentrix />
       </InitProvider>
     </React.StrictMode>
   );

@@ -17,15 +17,6 @@ declare global {
     };
   }
 
-  interface ZentrixShape {
-    id: string;
-    type: 'rectangle' | 'circle' | 'triangle' | 'path';
-    position: Point;
-    size: Size;
-    style: ShapeStyle;
-    transform?: Transform;
-  }
-
   interface Point {
     x: number;
     y: number;
@@ -36,47 +27,60 @@ declare global {
     height: number;
   }
 
-  interface ShapeStyle {
-    fill?: string;
-    stroke?: string;
-    strokeWidth?: number;
-    opacity?: number;
-    shadow?: Shadow;
-    gradient?: Gradient;
-  }
-
-  interface Shadow {
-    color: string;
-    blur: number;
-    offsetX: number;
-    offsetY: number;
-  }
-
-  interface Gradient {
-    type: 'linear' | 'radial';
-    stops: Array<{
-      offset: number;
-      color: string;
-    }>;
-    angle?: number; // linear gradient only
-    center?: Point; // radial gradient only
-  }
-
   interface Transform {
     rotate?: number;
     scale?: Point;
     skew?: Point;
   }
 
+  interface ShapeStyle {
+    fill?: string;
+    stroke?: string;
+    strokeWidth?: number;
+    opacity?: number;
+    shadow?: {
+      color: string;
+      blur: number;
+      offsetX: number;
+      offsetY: number;
+    };
+    gradient?: Gradient;
+  }
+
+  interface GradientStop {
+    offset: number;
+    color: string;
+  }
+
+  interface Gradient {
+    type: 'linear' | 'radial';
+    stops: GradientStop[];
+    angle?: number; // linear gradient only
+    center?: Point; // radial gradient only
+  }
+
+  interface ZentrixShape {
+    id: string;
+    type: 'rectangle' | 'circle' | 'triangle';
+    position: Point;
+    size: Size;
+    style: ShapeStyle;
+    transform?: Transform;
+    isVisible?: boolean;
+    groupId?: string;
+  }
+
+  interface ZentrixCanvas {
+    width: number;
+    height: number;
+    background: string;
+  }
+
   interface ZentrixDesign {
     id: string;
     name: string;
+    canvas: ZentrixCanvas;
     shapes: ZentrixShape[];
-    canvas: {
-      width: number;
-      height: number;
-      background: string;
-    };
   }
 }
 

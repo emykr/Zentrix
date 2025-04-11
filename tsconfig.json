@@ -24,7 +24,8 @@
       "@utils/*": ["src/utils/*"],
       "@pages/*": ["src/pages/*"],
       "@assets/*": ["src/assets/*"],
-      "@lang/*": ["src/lang/*"]
+      "@lang/*": ["src/lang/*"],
+      
     }
   },
   "include": ["src"],
