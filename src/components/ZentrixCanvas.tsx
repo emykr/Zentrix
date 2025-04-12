@@ -12,7 +12,7 @@ interface ZentrixCanvasProps {
   selectedShapeId?: string | null;
 }
 
-export const ZentrixCanvas: React.FC<ZentrixCanvasProps> = ({
+const ZentrixCanvas: React.FC<ZentrixCanvasProps> = ({
   design,
   onShapeClick,
   onShapeDelete,
@@ -513,3 +513,5 @@ export const ZentrixCanvas: React.FC<ZentrixCanvasProps> = ({
     </>
   );
 };
+
+export default ZentrixCanvas;

@@ -21,7 +21,7 @@ const initializeApp = async (): Promise<InitializationStatus> => {
     window.__APP_INITIALIZED__ = false;
 
     // 2. 언어 설정
-    setLang('ko');
+    setLang('en');
 
     // 3. 기타 초기화 작업
     console.log('App initialized with config:', config);

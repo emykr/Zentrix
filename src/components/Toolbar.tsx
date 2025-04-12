@@ -2,15 +2,15 @@ import React from 'react';
 import { getIconsByCategory } from '@utils/IconLoader';
 
 interface ToolbarProps {
+  selectedTool: string;
+  selectedShapeId: string | null;
   onToolSelect: (toolId: string) => void;
-  selectedTool?: string;
-  onLayerOrderChange?: (shapeId: string, direction: 'up' | 'down') => void;
+  onLayerOrderChange?: (id: string, direction: 'up' | 'down') => void;
   onGroupShapes?: () => void;
   onUngroupShapes?: () => void;
-  selectedShapeId?: string | null;
 }
 
-export const Toolbar: React.FC<ToolbarProps> = ({
+const Toolbar: React.FC<ToolbarProps> = ({
   onToolSelect,
   selectedTool,
   onLayerOrderChange,
@@ -88,3 +88,5 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     </div>
   );
 };
+
+export default Toolbar;

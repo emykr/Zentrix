@@ -13,7 +13,7 @@ interface MenuBarProps {
   onExport?: () => void;
 }
 
-export const MenuBar: React.FC<MenuBarProps> = ({
+const MenuBar: React.FC<MenuBarProps> = ({
   onNew,
   onOpen,
   onSave,
@@ -94,3 +94,5 @@ export const MenuBar: React.FC<MenuBarProps> = ({
     </div>
   );
 };
+
+export default MenuBar;

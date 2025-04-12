@@ -1,7 +1,15 @@
 import React from 'react';
 import { keyboardManager } from '@utils/KeyboardManager';
 
-export const KeyboardShortcuts: React.FC = () => {
+interface KeyboardShortcutsProps {
+  shortcuts: Array<{
+    key: string;
+    description: string;
+    category?: string;
+  }>;
+}
+
+const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ shortcuts }) => {
   const commands = keyboardManager.getRegisteredCommands();
 
   return (
@@ -27,3 +35,5 @@ export const KeyboardShortcuts: React.FC = () => {
     </div>
   );
 };
+
+export default KeyboardShortcuts;

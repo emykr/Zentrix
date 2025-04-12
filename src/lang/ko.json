@@ -11,8 +11,7 @@
     "loading": "로딩 중...",
     "initialized": "초기화 완료",
     "newDesign": "새 디자인",
-    "enterTitle": "제목을 입력해 주세요",
-    "continuePrompt": "계속 반복하시겠습니까?"
+    "enterTitle": "제목을 입력해 주세요"
   },
   "error": {
     "initialization": "초기화 오류",

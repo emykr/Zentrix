@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Zentrix } from '@pages/Zentrix';
 import { InitProvider } from '@core/InitializationContext';
 import '@styles/ui.css';
+
+const Zentrix = React.lazy(() => import('@pages/Zentrix'));
 
 const App: React.FC = () => {
   return (
     <React.StrictMode>
       <InitProvider>
-        <Zentrix />
+        <Suspense fallback={<div className="loading">로딩 중...</div>}>
+          <Zentrix />
+        </Suspense>
       </InitProvider>
     </React.StrictMode>
   );

@@ -10,7 +10,7 @@ const langs = {
 
 type Lang = keyof typeof langs;
 
-let currentLang: Lang = (localStorage.getItem('zentrix-lang') as Lang) || 'ko';
+let currentLang: Lang = (localStorage.getItem('zentrix-lang') as Lang) || 'ko' || 'en';
 
 export const setLang = (lang: Lang) => {
   currentLang = lang;

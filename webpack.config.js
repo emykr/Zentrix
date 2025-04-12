@@ -41,13 +41,23 @@ module.exports = {
   },
   optimization: {
     minimize: true,
-    minimizer: [new TerserPlugin({
-      terserOptions: {
-        compress: {
-          drop_console: process.env.NODE_ENV === 'production',
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: process.env.NODE_ENV === 'production',
+            pure_funcs: ['console.log'],
+            drop_debugger: true,
+            dead_code: true,
+          },
+          mangle: true,
+          output: {
+            comments: false,
+          },
         },
-      },
-    })],
+        extractComments: false,
+      }),
+    ],
     splitChunks: {
       chunks: 'all',
       minSize: 20000,
@@ -55,23 +65,24 @@ module.exports = {
       cacheGroups: {
         defaultVendors: {
           test: /[\\/]node_modules[\\/]/,
-          priority: -10,
+          name: 'vendors',
+          chunks: 'all',
+          priority: 20,
+          enforce: true,
           reuseExistingChunk: true,
-          name: 'vendors'
         },
-        radix: {
-          test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
-          priority: 0,
-          reuseExistingChunk: true,
-          name: 'radix'
-        },
-        default: {
+        common: {
+          name: 'common',
           minChunks: 2,
-          priority: -20,
-          reuseExistingChunk: true
+          chunks: 'async',
+          priority: 10,
+          reuseExistingChunk: true,
+          enforce: true
         }
       }
-    }
+    },
+    runtimeChunk: 'single',
+    moduleIds: 'deterministic'
   },
   plugins: [
     new HtmlWebpackPlugin({

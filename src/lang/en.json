@@ -11,5 +11,13 @@
   "error": {
     "initialization": "Initialization Error",
     "unknown": "An unknown error occurred"
+  },
+  "bootstrap": {
+    "title": "System Bootstrap",
+    "progress": "Bootstrap Progress",
+    "preparing": "Preparing system...",
+    "loading": "Loading components...",
+    "complete": "Bootstrap complete",
+    "error": "Bootstrap failed"
   }
 }

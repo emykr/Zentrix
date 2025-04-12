@@ -2,10 +2,10 @@ import React from 'react';
 import { getIconsByCategory } from '@utils/IconLoader';
 
 interface ComponentPanelProps {
-  onSelectComponent: (componentId: string) => void;
+  onSelectComponent: (id: string) => void;
 }
 
-export const ComponentPanel: React.FC<ComponentPanelProps> = ({ onSelectComponent }) => {
+const ComponentPanel: React.FC<ComponentPanelProps> = ({ onSelectComponent }) => {
   const shapes = getIconsByCategory('shape');
   const components = getIconsByCategory('component');
   const layouts = getIconsByCategory('layout');
@@ -67,3 +67,5 @@ export const ComponentPanel: React.FC<ComponentPanelProps> = ({ onSelectComponen
     </div>
   );
 };
+
+export default ComponentPanel;

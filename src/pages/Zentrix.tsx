@@ -1,15 +1,22 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { ZentrixCanvas } from '@components/ZentrixCanvas';
-import { ComponentPanel } from '@components/ComponentPanel';
-import { Toolbar } from '@components/Toolbar';
-import { KeyboardShortcuts } from '@components/KeyboardShortcuts';
-import { LayerPanel } from '@components/LayerPanel';
-import { MenuBar } from '@components/MenuBar';
+import React, { useState, useCallback, useEffect, Suspense } from 'react';
+const ZentrixCanvas = React.lazy(() => import('@components/ZentrixCanvas'));
+const ComponentPanel = React.lazy(() => import('@components/ComponentPanel'));
+const Toolbar = React.lazy(() => import('@components/Toolbar'));
+const KeyboardShortcuts = React.lazy(() => import('@components/KeyboardShortcuts'));
+const LayerPanel = React.lazy(() => import('@components/LayerPanel'));
+const MenuBar = React.lazy(() => import('@components/MenuBar'));
+
 import { createShape, moveShape, rotateShape, updateShape } from '@utils/DesignUtils';
 import { getIconById } from '@utils/IconLoader';
 import { keyboardManager } from '@utils/KeyboardManager';
 
-export const Zentrix: React.FC = () => {
+const LoadingComponent = () => (
+  <div className="flex items-center justify-center p-4">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300"></div>
+  </div>
+);
+
+const Zentrix: React.FC = () => {
   const [design, setDesign] = useState<ZentrixDesign>({
     id: 'demo-1',
     name: 'Zentrix Demo',
@@ -315,44 +322,54 @@ export const Zentrix: React.FC = () => {
 
   return (
     <div className="fixed inset-0 bg-slate-900 flex flex-col">
-      <MenuBar 
-        onNew={handleNewDesign}
-        onOpen={handleOpenDesign}
-        onSave={handleSaveDesign}
-        onExport={handleExportDesign}
-      />
+      <Suspense fallback={<LoadingComponent />}>
+        <MenuBar 
+          onNew={handleNewDesign}
+          onOpen={handleOpenDesign}
+          onSave={handleSaveDesign}
+          onExport={handleExportDesign}
+        />
+      </Suspense>
       <div className="flex flex-1 overflow-hidden">
-        <ComponentPanel onSelectComponent={handleComponentSelect} />
+        <Suspense fallback={<LoadingComponent />}>
+          <ComponentPanel onSelectComponent={handleComponentSelect} />
+        </Suspense>
         <div className="flex-1 flex flex-col">
-          <Toolbar
-            onToolSelect={handleToolSelect}
-            selectedTool={selectedTool}
-            onLayerOrderChange={handleLayerOrderChange}
-            onGroupShapes={handleGroupShapes}
-            onUngroupShapes={handleUngroupShapes}
-            selectedShapeId={selectedShapeId}
-          />
+          <Suspense fallback={<LoadingComponent />}>
+            <Toolbar
+              onToolSelect={handleToolSelect}
+              selectedTool={selectedTool}
+              onLayerOrderChange={handleLayerOrderChange}
+              onGroupShapes={handleGroupShapes}
+              onUngroupShapes={handleUngroupShapes}
+              selectedShapeId={selectedShapeId}
+            />
+          </Suspense>
           <div className="flex-1 flex items-center justify-center overflow-hidden">
             <div className="relative transform scale-90">
-              <ZentrixCanvas
-                design={design}
-                onShapeClick={handleShapeClick}
-                onShapeDelete={handleShapeDelete}
-                onShapeRotate={handleShapeRotate}
-                onShapeDuplicate={handleShapeDuplicate}
-                onShapeUpdate={handleShapeUpdate}
-                selectedShapeId={selectedShapeId}
-              />
+              <Suspense fallback={<LoadingComponent />}>
+                <ZentrixCanvas
+                  design={design}
+                  onShapeClick={handleShapeClick}
+                  onShapeDelete={handleShapeDelete}
+                  onShapeRotate={handleShapeRotate}
+                  onShapeDuplicate={handleShapeDuplicate}
+                  onShapeUpdate={handleShapeUpdate}
+                  selectedShapeId={selectedShapeId}
+                />
+              </Suspense>
             </div>
           </div>
         </div>
-        <LayerPanel
-          shapes={design.shapes}
-          selectedShapeId={selectedShapeId}
-          onSelectShape={handleShapeClick}
-          onLayerOrderChange={handleLayerOrderChange}
-          onShapeVisibilityToggle={handleShapeVisibilityToggle}
-        />
+        <Suspense fallback={<LoadingComponent />}>
+          <LayerPanel
+            shapes={design.shapes}
+            selectedShapeId={selectedShapeId}
+            onSelectShape={handleShapeClick}
+            onLayerOrderChange={handleLayerOrderChange}
+            onShapeVisibilityToggle={handleShapeVisibilityToggle}
+          />
+        </Suspense>
       </div>
       {selectedShapeId && (
         <div className="fixed bottom-4 left-72 ui-panel max-w-md">
@@ -363,7 +380,11 @@ export const Zentrix: React.FC = () => {
           </p>
         </div>
       )}
-      <KeyboardShortcuts />
+      <Suspense fallback={<LoadingComponent />}>
+        <KeyboardShortcuts shortcuts={[]} />
+      </Suspense>
     </div>
   );
 };
+
+export default Zentrix;

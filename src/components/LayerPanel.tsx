@@ -4,12 +4,12 @@ import { getIconById } from '@utils/IconLoader';
 interface LayerPanelProps {
   shapes: ZentrixShape[];
   selectedShapeId: string | null;
-  onSelectShape: (shapeId: string) => void;
-  onLayerOrderChange: (shapeId: string, direction: 'up' | 'down') => void;
-  onShapeVisibilityToggle: (shapeId: string) => void;
+  onSelectShape: (id: string) => void;
+  onLayerOrderChange: (id: string, direction: 'up' | 'down') => void;
+  onShapeVisibilityToggle: (id: string) => void;
 }
 
-export const LayerPanel: React.FC<LayerPanelProps> = ({
+const LayerPanel: React.FC<LayerPanelProps> = ({
   shapes,
   selectedShapeId,
   onSelectShape,
@@ -82,3 +82,5 @@ export const LayerPanel: React.FC<LayerPanelProps> = ({
     </div>
   );
 };
+
+export default LayerPanel;
