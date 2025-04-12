@@ -20,7 +20,7 @@
 
   .ui-text {
     @apply text-sm font-medium tracking-wide;
-  }
+  } 
 
   .ui-container {
     @apply fixed inset-0 flex items-center justify-center;
@@ -28,40 +28,27 @@
 
   .zentrix-canvas {
     @apply bg-white rounded-lg shadow-lg;
-    image-rendering: pixelated;
     touch-action: none;
-    max-width: calc(100vw - 32rem);
-    max-height: calc(100vh - 8rem);
   }
 
   .zentrix-container {
-    @apply flex-1 flex items-center justify-center overflow-hidden p-4;
+    @apply flex-1 flex items-center justify-center min-h-screen p-4;
+    max-width: 100vw;
+    max-height: 100vh;
   }
 
   .component-panel {
-    @apply fixed left-0 top-0 h-full w-64 bg-slate-900/95 backdrop-blur-md border-r border-white/10 flex flex-col;
+    @apply fixed left-0 top-10 bottom-0 w-16 bg-slate-900/95 backdrop-blur-md border-r border-white/10 
+           flex flex-col z-40;
+    transition: width 0.3s ease-in-out;
+  }
+
+  .component-panel:hover {
+    @apply w-48;
   }
 
   .component-panel-content {
-    @apply flex-1 p-4 overflow-y-auto overflow-x-hidden;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-  }
-
-  .component-panel-content::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .component-panel-content::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .component-panel-content::-webkit-scrollbar-thumb {
-    @apply bg-white/20 rounded-full;
-  }
-
-  .component-panel-content::-webkit-scrollbar-thumb:hover {
-    @apply bg-white/30;
+    @apply flex-1 p-4 zentrix-scrollbar;
   }
 
   .panel-section {
@@ -98,6 +85,19 @@
     @apply bg-blue-600 text-white;
   }
 
+  .mini-toolbar {
+    @apply fixed top-4 left-1/2 transform -translate-x-1/2 bg-slate-800/95 backdrop-blur-sm 
+           rounded-lg border border-white/10 shadow-lg z-40 flex gap-1 p-1;
+  }
+
+  .mini-tool-button {
+    @apply p-1.5 rounded text-white/80 hover:text-white hover:bg-slate-700/50 transition-colors;
+  }
+
+  .mini-tool-button.active {
+    @apply bg-blue-600/90 text-white;
+  }
+
   .keyboard-shortcuts-panel {
     @apply fixed right-4 bottom-4 bg-slate-800/95 backdrop-blur-sm 
            rounded-lg border border-white/10 p-4 max-w-md;
@@ -120,30 +120,12 @@
   }
 
   .layer-panel {
-    @apply fixed right-0 top-0 w-64 h-screen bg-slate-900/95 backdrop-blur-md 
-           border-l border-white/10 flex flex-col;
+    @apply fixed right-0 top-10 bottom-0 w-64 bg-slate-900/95 backdrop-blur-md 
+           border-l border-white/10 flex flex-col z-40;
   }
 
   .layer-panel-content {
-    @apply flex-1 p-4 overflow-y-auto overflow-x-hidden;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-  }
-
-  .layer-panel-content::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .layer-panel-content::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .layer-panel-content::-webkit-scrollbar-thumb {
-    @apply bg-white/20 rounded-full;
-  }
-
-  .layer-panel-content::-webkit-scrollbar-thumb:hover {
-    @apply bg-white/30;
+    @apply flex-1 p-4 zentrix-scrollbar;
   }
 
   .panel-header {
@@ -186,5 +168,108 @@
   .layer-button {
     @apply p-1 rounded hover:bg-white/10 text-white/70 hover:text-white 
            disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .menu-bar {
+    @apply fixed top-0 left-0 right-0 h-10 bg-slate-800/95 backdrop-blur-sm border-b border-white/10 
+           flex items-center px-4 z-50;
+  }
+
+  .menu-item {
+    @apply px-4 h-full flex items-center text-sm text-white/80 hover:text-white hover:bg-slate-700/50 
+           transition-colors relative;
+  }
+
+  .menu-dropdown {
+    @apply absolute left-0 top-full mt-1 bg-slate-800/95 backdrop-blur-sm border border-white/10 
+           rounded-lg shadow-xl min-w-[200px] py-1 z-50;
+  }
+
+  .menu-dropdown-item {
+    @apply px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-slate-700/50 flex items-center gap-2;
+  }
+
+  .tools-container {
+    @apply fixed top-12 left-1/2 transform -translate-x-1/2 bg-slate-800/95 backdrop-blur-sm 
+           rounded-lg border border-white/10 p-1 flex gap-1 shadow-lg z-40;
+  }
+
+  .tool-group {
+    @apply flex flex-col gap-2;
+  }
+
+  .tool-divider {
+    @apply my-4 h-px bg-white/10;
+  }
+
+  .tool-button {
+    @apply flex items-center gap-3 p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 
+           transition-colors text-white/90 hover:text-white w-full relative;
+  }
+
+  .tool-button.active {
+    @apply bg-blue-600/50 hover:bg-blue-500/50;
+  }
+
+  .tool-label {
+    @apply text-sm font-medium absolute left-12 opacity-0 pointer-events-none whitespace-nowrap;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .component-panel:hover .tool-label {
+    @apply opacity-100;
+  }
+
+  .shapes-panel {
+    @apply fixed top-12 left-4 bg-slate-800/95 backdrop-blur-sm rounded-lg border border-white/10 
+           p-4 shadow-lg z-30 zentrix-scrollbar max-h-[calc(100vh-6rem)];
+  }
+
+  .shapes-grid {
+    @apply grid grid-cols-3 gap-2;
+  }
+
+  .shape-button {
+    @apply p-3 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors flex flex-col 
+           items-center gap-2 text-white/90 hover:text-white;
+  }
+
+  .tool-grid {
+    @apply flex flex-col gap-2;
+  }
+
+  /* 공통 스크롤바 스타일 */
+  .zentrix-scrollbar {
+    @apply overflow-y-auto overflow-x-hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    height: 100%;
+  }
+
+  .zentrix-scrollbar::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  .zentrix-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .zentrix-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-white/20 rounded-full;
+  }
+
+  .zentrix-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/30;
+  }
+
+  .zentrix-layout {
+    @apply min-h-screen bg-slate-900;
+    height: 100%;
+    min-height: 100vh;
+  }
+
+  .zentrix-content {
+    @apply pt-10 pl-16 pr-64;  /* MenuBar, ComponentPanel, LayerPanel 영역 제외 */
+    min-height: calc(100vh - 40px);  /* MenuBar 높이 제외 */
   }
 }

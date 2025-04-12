@@ -4,19 +4,28 @@ export const createShape = (
   type: ZentrixShape['type'],
   position: Point,
   size: Size,
-  style: Partial<ShapeStyle> = {}
+  options: Partial<Pick<ZentrixShape, 'text' | 'style' | 'transform'>> = {}
 ): ZentrixShape => {
+  // 기본 스타일 설정
+  const defaultStyle: ShapeStyle = {
+    fill: '#ffffff',
+    stroke: '#000000',
+    strokeWidth: 1,
+    opacity: 1
+  };
+
   return {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     type,
     position,
     size,
     style: {
-      fill: '#3b82f6',
-      stroke: '#1d4ed8',
-      strokeWidth: 2,
-      ...style
-    }
+      ...defaultStyle,
+      ...options.style
+    },
+    transform: options.transform,
+    text: options.text,
+    ...(type === 'group' ? { children: [] } : {})
   };
 };
 

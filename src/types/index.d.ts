@@ -45,6 +45,8 @@ declare global {
       offsetY: number;
     };
     gradient?: Gradient;
+    fontSize?: number;  // 텍스트용 폰트 크기
+    fontFamily?: string;  // 텍스트용 폰트
   }
 
   interface GradientStop {
@@ -59,15 +61,17 @@ declare global {
     center?: Point; // radial gradient only
   }
 
+  type ShapeType = 'rectangle' | 'circle' | 'triangle' | 'text' | 'group';
+
   interface ZentrixShape {
     id: string;
-    type: 'rectangle' | 'circle' | 'triangle';
+    type: ShapeType;
     position: Point;
     size: Size;
-    style: ShapeStyle;
+    style: ShapeStyle; // style을 optional(?)에서 required로 변경
     transform?: Transform;
-    isVisible?: boolean;
-    groupId?: string;
+    text?: string;
+    children?: ZentrixShape[]; // 그룹 도형을 위한 자식 도형 배열
   }
 
   interface ZentrixCanvas {

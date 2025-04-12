@@ -2,63 +2,47 @@ import React from 'react';
 import { getIconsByCategory } from '@utils/IconLoader';
 
 interface ComponentPanelProps {
-  onSelectComponent: (id: string) => void;
+  selectedTool: string;
+  onToolSelect: (toolId: string) => void;
 }
 
-const ComponentPanel: React.FC<ComponentPanelProps> = ({ onSelectComponent }) => {
-  const shapes = getIconsByCategory('shape');
-  const components = getIconsByCategory('component');
-  const layouts = getIconsByCategory('layout');
+const ComponentPanel: React.FC<ComponentPanelProps> = ({ selectedTool, onToolSelect }) => {
+  const cursorTools = getIconsByCategory('cursor');
+  const basicTools = getIconsByCategory('basic');
 
   return (
     <div className="component-panel">
       <div className="component-panel-content">
         <div className="panel-section">
-          <h3 className="panel-title">도형</h3>
-          <div className="panel-grid">
-            {shapes.map(shape => (
+          {/* 커서 도구들 (선택, 손) */}
+          <div className="tool-group">
+            {cursorTools.map(tool => (
               <button
-                key={shape.id}
-                className="component-button"
-                onClick={() => onSelectComponent(shape.id)}
-                title={`${shape.title} ${shape.shortcut ? `(${shape.shortcut})` : ''}`}
+                key={tool.id}
+                className={`tool-button ${selectedTool === tool.id ? 'active' : ''}`}
+                onClick={() => onToolSelect(tool.id)}
+                title={tool.title}
               >
-                <div dangerouslySetInnerHTML={{ __html: shape.svg }} />
-                <span className="component-label">{shape.title}</span>
+                <span className="tool-icon" dangerouslySetInnerHTML={{ __html: tool.svg }} />
+                <span className="tool-label">{tool.title}</span>
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="panel-section">
-          <h3 className="panel-title">레이아웃</h3>
-          <div className="panel-grid">
-            {layouts.map(layout => (
-              <button
-                key={layout.id}
-                className="component-button"
-                onClick={() => onSelectComponent(layout.id)}
-                title={`${layout.title} ${layout.shortcut ? `(${layout.shortcut})` : ''}`}
-              >
-                <div dangerouslySetInnerHTML={{ __html: layout.svg }} />
-                <span className="component-label">{layout.title}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+          {/* 구분선 */}
+          <div className="tool-divider" />
 
-        <div className="panel-section">
-          <h3 className="panel-title">컴포넌트</h3>
-          <div className="panel-grid">
-            {components.map(component => (
+          {/* 도형과 텍스트 도구 */}
+          <div className="tool-group">
+            {basicTools.map(tool => (
               <button
-                key={component.id}
-                className="component-button"
-                onClick={() => onSelectComponent(component.id)}
-                title={`${component.title} ${component.shortcut ? `(${component.shortcut})` : ''}`}
+                key={tool.id}
+                className={`tool-button ${selectedTool === tool.id ? 'active' : ''}`}
+                onClick={() => onToolSelect(tool.id)}
+                title={tool.title}
               >
-                <div dangerouslySetInnerHTML={{ __html: component.svg }} />
-                <span className="component-label">{component.title}</span>
+                <span className="tool-icon" dangerouslySetInnerHTML={{ __html: tool.svg }} />
+                <span className="tool-label">{tool.title}</span>
               </button>
             ))}
           </div>

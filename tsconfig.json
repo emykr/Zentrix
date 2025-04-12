@@ -25,6 +25,7 @@
       "@pages/*": ["src/pages/*"],
       "@assets/*": ["src/assets/*"],
       "@lang/*": ["src/lang/*"],
+      "@handler/*": ["src/handler/*"]
       
     }
   },

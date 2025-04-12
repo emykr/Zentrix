@@ -1,10 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { ContextMenu } from './ContextMenu';
-import { getDistance, getAngle, getTransformHandleType } from '@utils/MathUtils';
+import { getAngle, getTransformHandleType } from '@utils/MathUtils';
+import { Grid } from './Grid';
+import { t } from '@utils/LangLoader';
 
 interface ZentrixCanvasProps {
   design: ZentrixDesign;
-  onShapeClick?: (shapeId: string) => void;
+  onShapeClick?: (shapeId: string | null, e?: React.MouseEvent) => void;
   onShapeDelete?: (shapeId: string) => void;
   onShapeRotate?: (shapeId: string, angle: number) => void;
   onShapeDuplicate?: (shapeId: string) => void;
@@ -82,105 +84,109 @@ const ZentrixCanvas: React.FC<ZentrixCanvasProps> = ({
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!onShapeClick) return;
-
+    
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // 클릭된 도형 찾기 (가장 위에 있는 도형부터)
+    // Z-index 순서대로 도형 체크 (위에 있는 도형부터)
     for (let i = design.shapes.length - 1; i >= 0; i--) {
       const shape = design.shapes[i];
       if (isPointInShape(x, y, shape)) {
-        onShapeClick(shape.id);
-        break;
+        e.stopPropagation(); // 이벤트 전파 중지
+        onShapeClick(shape.id, e);
+        return;
       }
     }
-  };
+
+    // 빈 공간 클릭시 선택 해제
+    onShapeClick(null);
+  }
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas || !selectedShapeId) return;
+    if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const selectedShape = design.shapes.find(s => s.id === selectedShapeId);
-    if (!selectedShape) return;
-
-    const handleType = getTransformHandleType(x, y, selectedShape);
+    // 클릭 이벤트 전파 중지
+    e.stopPropagation();
     
-    if (handleType !== 'none') {
-      setTransformType(handleType);
-      setTransformStart({ x, y });
-      setOriginalShape(selectedShape);
-      e.stopPropagation(); // 도형 드래그 방지
-      return;
+    // 선택된 도형이 있는 경우 변형 핸들 체크
+    if (selectedShapeId) {
+      const selectedShape = design.shapes.find(s => s.id === selectedShapeId);
+      if (selectedShape) {
+        const handleType = getTransformHandleType(x, y, selectedShape);
+        if (handleType !== 'none') {
+          setTransformType(handleType);
+          setTransformStart({ x, y });
+          setOriginalShape({ ...selectedShape });
+          return;
+        }
+      }
     }
 
-    if (isPointInShape(x, y, selectedShape)) {
-      setIsDragging(true);
-      setDragStart({ x, y });
-      e.stopPropagation();
+    // Z-index 순서대로 도형 체크 (위에 있는 도형부터)
+    for (let i = design.shapes.length - 1; i >= 0; i--) {
+      const shape = design.shapes[i];
+      if (isPointInShape(x, y, shape)) {
+        if (shape.id !== selectedShapeId) {
+          onShapeClick?.(shape.id);
+        }
+        setIsDragging(true);
+        setDragStart({ x, y });
+        setOriginalShape({ ...shape });
+        return;
+      }
     }
+
+    // 빈 공간 클릭시 선택 해제
+    onShapeClick?.(null);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas || !selectedShapeId) return;
+    if (!canvas || !selectedShapeId || !originalShape) return;  // originalShape null 체크 추가
 
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    if (isDragging && dragStart) {
-      const deltaX = x - dragStart.x;
-      const deltaY = y - dragStart.y;
-
-      const shape = design.shapes.find(s => s.id === selectedShapeId);
-      if (!shape) return;
-
+    if (isDragging) {
+      const deltaX = x - (dragStart?.x || 0);
+      const deltaY = y - (dragStart?.y || 0);
+      
       onShapeUpdate?.(selectedShapeId, {
         position: {
-          x: shape.position.x + deltaX,
-          y: shape.position.y + deltaY
+          x: originalShape.position.x + deltaX,
+          y: originalShape.position.y + deltaY
         }
       });
+    } else if (transformType === 'rotate' && transformStart) {
+      const center = {
+        x: originalShape.position.x + originalShape.size.width / 2,
+        y: originalShape.position.y + originalShape.size.height / 2
+      };
 
-      setDragStart({ x, y });
-    } else if (transformType !== 'none' && transformStart && originalShape) {
-      if (transformType === 'rotate') {
-        const center = {
-          x: originalShape.position.x + originalShape.size.width / 2,
-          y: originalShape.position.y + originalShape.size.height / 2
-        };
+      const startAngle = getAngle(center, transformStart);
+      const currentAngle = getAngle(center, { x, y });
+      let deltaAngle = currentAngle - startAngle;
 
-        const startAngle = getAngle(center, transformStart);
-        const currentAngle = getAngle(center, { x, y });
-        const deltaAngle = currentAngle - startAngle;
-        const newRotation = ((originalShape.transform?.rotate || 0) + deltaAngle) % 360;
-
-        onShapeUpdate?.(selectedShapeId, {
-          transform: {
-            ...originalShape.transform,
-            rotate: newRotation
-          }
-        });
-      } else if (transformType === 'resize') {
-        const deltaX = x - transformStart.x;
-        const deltaY = y - transformStart.y;
-        const newWidth = Math.max(20, originalShape.size.width + deltaX);
-        const newHeight = Math.max(20, originalShape.size.height + deltaY);
-
-        onShapeUpdate?.(selectedShapeId, {
-          size: {
-            width: newWidth,
-            height: newHeight
-          }
-        });
+      // Shift 키를 누른 경우 15도 단위로 회전
+      if (e.shiftKey) {
+        deltaAngle = Math.round(deltaAngle / 15) * 15;
       }
+
+      onShapeUpdate?.(selectedShapeId, {
+        transform: {
+          ...originalShape.transform,
+          rotate: ((originalShape.transform?.rotate || 0) + deltaAngle) % 360
+        }
+      });
     }
   };
 
@@ -276,27 +282,62 @@ const ZentrixCanvas: React.FC<ZentrixCanvasProps> = ({
   const renderShape = (ctx: CanvasRenderingContext2D, shape: ZentrixShape) => {
     ctx.save();
 
-    // 변환 적용
+    // Transform 적용
     if (shape.transform) {
-      const { x, y } = shape.position;
-      ctx.translate(x, y);
+      const centerX = shape.position.x + shape.size.width / 2;
+      const centerY = shape.position.y + shape.size.height / 2;
+
+      ctx.translate(centerX, centerY);
       if (shape.transform.rotate) {
         ctx.rotate((shape.transform.rotate * Math.PI) / 180);
       }
-      if (shape.transform.scale) {
-        ctx.scale(shape.transform.scale.x, shape.transform.scale.y);
-      }
-      if (shape.transform.skew) {
-        ctx.transform(1, shape.transform.skew.y, shape.transform.skew.x, 1, 0, 0);
-      }
-      ctx.translate(-x, -y);
+      ctx.translate(-centerX, -centerY);
     }
 
-    // 스타일 적용
+    // Style 적용
     applyStyle(ctx, shape.style);
 
-    // 도형 타입에 따른 렌더링
+    // 도형 타입별 렌더링
     switch (shape.type) {
+      case 'group':
+        // 그룹의 경계 상자 렌더링
+        ctx.strokeStyle = shape.style.stroke || '#2196f3';
+        ctx.lineWidth = shape.style.strokeWidth || 1;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(
+          shape.position.x,
+          shape.position.y,
+          shape.size.width,
+          shape.size.height
+        );
+        ctx.setLineDash([]);
+
+        // 자식 도형들 렌더링
+        if (shape.children) {
+          shape.children.forEach(child => {
+            const childInGroup = {
+              ...child,
+              position: {
+                x: shape.position.x + child.position.x,
+                y: shape.position.y + child.position.y
+              }
+            };
+            renderShape(ctx, childInGroup);
+          });
+        }
+        break;
+      case 'text':
+        const fontSize = shape.style.fontSize || 16;
+        ctx.font = `${fontSize}px ${shape.style.fontFamily || 'sans-serif'}`;
+        ctx.fillStyle = shape.style.fill || '#000000';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(
+          shape.text || t('common.enterText'),
+          shape.position.x + shape.size.width / 2,
+          shape.position.y + shape.size.height / 2
+        );
+        break;
       case 'rectangle':
         ctx.fillRect(
           shape.position.x,
@@ -376,7 +417,7 @@ const ZentrixCanvas: React.FC<ZentrixCanvasProps> = ({
     
     const { x, y } = shape.position;
     const { width, height } = shape.size;
-    const handleSize = 10;
+    const handleSize = 8;
     
     // 회전 중심점 적용
     if (shape.transform?.rotate) {
@@ -385,37 +426,35 @@ const ZentrixCanvas: React.FC<ZentrixCanvasProps> = ({
       ctx.translate(-(x + width / 2), -(y + height / 2));
     }
     
-    // 모서리 핸들
-    const handlePositions = [
-      { x, y }, // 좌상단
-      { x: x + width, y }, // 우상단
-      { x: x + width, y: y + height }, // 우하단
-      { x, y: y + height }, // 좌하단
-      { x: x + width / 2, y }, // 상단 중앙
-      { x: x + width, y: y + height / 2 }, // 우측 중앙
-      { x: x + width / 2, y: y + height }, // 하단 중앙
-      { x, y: y + height / 2 } // 좌측 중앙
-    ];
+    // 이동 핸들 (중앙)
+    const moveHandle = {
+      x: x + width / 2,
+      y: y + height / 2
+    };
     
-    // 핸들 그리기
-    handlePositions.forEach(pos => {
-      ctx.beginPath();
-      ctx.rect(pos.x - handleSize/2, pos.y - handleSize/2, handleSize, handleSize);
-      ctx.fill();
-      ctx.stroke();
-    });
+    ctx.beginPath();
+    ctx.arc(moveHandle.x, moveHandle.y, handleSize, 0, Math.PI * 2);
+    ctx.fillStyle = '#2196f3';
+    ctx.fill();
+    ctx.stroke();
 
-    // 회전 핸들
-    const rotationHandleY = y - 30;
+    // 회전 핸들 (상단 중앙)
+    const rotateHandle = {
+      x: x + width / 2,
+      y: y - 30
+    };
+
+    // 회전 핸들로의 선
     ctx.beginPath();
     ctx.setLineDash([4, 4]);
     ctx.moveTo(x + width / 2, y);
-    ctx.lineTo(x + width / 2, rotationHandleY);
+    ctx.lineTo(rotateHandle.x, rotateHandle.y);
     ctx.stroke();
     
     ctx.setLineDash([]);
     ctx.beginPath();
-    ctx.arc(x + width / 2, rotationHandleY, handleSize/2, 0, Math.PI * 2);
+    ctx.arc(rotateHandle.x, rotateHandle.y, handleSize, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
     ctx.fill();
     ctx.stroke();
     
@@ -423,29 +462,27 @@ const ZentrixCanvas: React.FC<ZentrixCanvasProps> = ({
   };
 
   const applyStyle = (ctx: CanvasRenderingContext2D, style: ShapeStyle) => {
-    if (style.fill) {
-      if (style.gradient) {
-        const gradient = createGradient(ctx, style.gradient);
-        ctx.fillStyle = gradient;
-      } else {
-        ctx.fillStyle = style.fill;
-      }
-    }
-
-    if (style.stroke) {
-      ctx.strokeStyle = style.stroke;
-      ctx.lineWidth = style.strokeWidth || 1;
-    }
+    ctx.fillStyle = style.fill || '#ffffff';
+    ctx.strokeStyle = style.stroke || '#000000';
+    ctx.lineWidth = style.strokeWidth || 1;
+    ctx.globalAlpha = style.opacity ?? 1;
 
     if (style.shadow) {
       ctx.shadowColor = style.shadow.color;
       ctx.shadowBlur = style.shadow.blur;
       ctx.shadowOffsetX = style.shadow.offsetX;
       ctx.shadowOffsetY = style.shadow.offsetY;
+    } else {
+      // 그림자 효과 초기화
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
     }
 
-    if (style.opacity !== undefined) {
-      ctx.globalAlpha = style.opacity;
+    if (style.gradient) {
+      const gradient = createGradient(ctx, style.gradient);
+      ctx.fillStyle = gradient;
     }
   };
 
@@ -489,28 +526,34 @@ const ZentrixCanvas: React.FC<ZentrixCanvasProps> = ({
   };
 
   return (
-    <>
-      <canvas
-        ref={canvasRef}
-        width={design.canvas.width}
-        height={design.canvas.height}
-        onClick={handleCanvasClick}
-        onContextMenu={handleContextMenu}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        className="zentrix-canvas"
-      />
-      {contextMenu && (
-        <ContextMenu
-          items={getContextMenuItems(contextMenu.shapeId)}
-          x={contextMenu.x}
-          y={contextMenu.y}
-          onClose={() => setContextMenu(null)}
+    <div className="relative zentrix-scrollbar w-full h-full overflow-auto">
+      <div className="relative min-w-fit min-h-fit">
+        <Grid 
+          width={design.canvas.width} 
+          height={design.canvas.height} 
         />
-      )}
-    </>
+        <canvas
+          ref={canvasRef}
+          width={design.canvas.width}
+          height={design.canvas.height}
+          onClick={handleCanvasClick}
+          onContextMenu={handleContextMenu}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          className="zentrix-canvas relative z-10"
+        />
+        {contextMenu && (
+          <ContextMenu
+            items={getContextMenuItems(contextMenu.shapeId)}
+            x={contextMenu.x}
+            y={contextMenu.y}
+            onClose={() => setContextMenu(null)}
+          />
+        )}
+      </div>
+    </div>
   );
 };
 

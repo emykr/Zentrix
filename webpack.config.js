@@ -36,7 +36,8 @@ module.exports = {
       '@utils': path.resolve(__dirname, 'src/utils'),
       '@pages': path.resolve(__dirname, 'src/pages'),
       '@assets': path.resolve(__dirname, 'src/assets'),
-      '@lang': path.resolve(__dirname, 'src/lang')
+      '@lang': path.resolve(__dirname, 'src/lang'),
+      '@handler': path.resolve(__dirname, 'src/handler'),
     }
   },
   optimization: {

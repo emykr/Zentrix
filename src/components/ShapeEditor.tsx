@@ -25,7 +25,7 @@ export const ShapeEditor: React.FC<ShapeEditorProps> = ({ shape, onUpdate }) => 
             <label>색상</label>
             <input
               type="color"
-              value={shape.style.fill || '#000000'}
+              value={shape.style?.fill || '#000000'}
               onChange={(e) => updateStyle({ fill: e.target.value })}
             />
           </div>
@@ -34,7 +34,7 @@ export const ShapeEditor: React.FC<ShapeEditorProps> = ({ shape, onUpdate }) => 
             <label>테두리 색상</label>
             <input
               type="color"
-              value={shape.style.stroke || '#000000'}
+              value={shape.style?.stroke || '#000000'}
               onChange={(e) => updateStyle({ stroke: e.target.value })}
             />
           </div>
@@ -43,7 +43,7 @@ export const ShapeEditor: React.FC<ShapeEditorProps> = ({ shape, onUpdate }) => 
             <label>테두리 두께</label>
             <input
               type="number"
-              value={shape.style.strokeWidth || 0}
+              value={shape.style?.strokeWidth || 0}
               onChange={(e) => updateStyle({ strokeWidth: Number(e.target.value) })}
               min={0}
               max={20}
@@ -54,7 +54,7 @@ export const ShapeEditor: React.FC<ShapeEditorProps> = ({ shape, onUpdate }) => 
             <label>투명도</label>
             <input
               type="range"
-              value={(shape.style.opacity ?? 1) * 100}
+              value={(shape.style?.opacity ?? 1) * 100}
               onChange={(e) => updateStyle({ opacity: Number(e.target.value) / 100 })}
               min={0}
               max={100}
@@ -117,13 +117,13 @@ export const ShapeEditor: React.FC<ShapeEditorProps> = ({ shape, onUpdate }) => 
             <label>색상</label>
             <input
               type="color"
-              value={shape.style.shadow?.color || '#000000'}
+              value={shape.style?.shadow?.color || '#000000'}
               onChange={(e) => updateStyle({ 
                 shadow: { 
                   color: e.target.value,
-                  blur: shape.style.shadow?.blur || 0,
-                  offsetX: shape.style.shadow?.offsetX || 0,
-                  offsetY: shape.style.shadow?.offsetY || 0
+                  blur: shape.style?.shadow?.blur || 0,
+                  offsetX: shape.style?.shadow?.offsetX || 0,
+                  offsetY: shape.style?.shadow?.offsetY || 0
                 } 
               })}
             />
@@ -133,13 +133,13 @@ export const ShapeEditor: React.FC<ShapeEditorProps> = ({ shape, onUpdate }) => 
             <label>흐림</label>
             <input
               type="number"
-              value={shape.style.shadow?.blur || 0}
+              value={shape.style?.shadow?.blur || 0}
               onChange={(e) => updateStyle({ 
                 shadow: { 
-                  color: shape.style.shadow?.color || '#000000',
+                  color: shape.style?.shadow?.color || '#000000',
                   blur: Number(e.target.value),
-                  offsetX: shape.style.shadow?.offsetX || 0,
-                  offsetY: shape.style.shadow?.offsetY || 0
+                  offsetX: shape.style?.shadow?.offsetX || 0,
+                  offsetY: shape.style?.shadow?.offsetY || 0
                 } 
               })}
               min={0}
@@ -151,13 +151,13 @@ export const ShapeEditor: React.FC<ShapeEditorProps> = ({ shape, onUpdate }) => 
             <label>X 오프셋</label>
             <input
               type="number"
-              value={shape.style.shadow?.offsetX || 0}
+              value={shape.style?.shadow?.offsetX || 0}
               onChange={(e) => updateStyle({ 
                 shadow: { 
-                  color: shape.style.shadow?.color || '#000000',
-                  blur: shape.style.shadow?.blur || 0,
+                  color: shape.style?.shadow?.color || '#000000',
+                  blur: shape.style?.shadow?.blur || 0,
                   offsetX: Number(e.target.value),
-                  offsetY: shape.style.shadow?.offsetY || 0
+                  offsetY: shape.style?.shadow?.offsetY || 0
                 } 
               })}
               min={-50}
@@ -169,12 +169,12 @@ export const ShapeEditor: React.FC<ShapeEditorProps> = ({ shape, onUpdate }) => 
             <label>Y 오프셋</label>
             <input
               type="number"
-              value={shape.style.shadow?.offsetY || 0}
+              value={shape.style?.shadow?.offsetY || 0}
               onChange={(e) => updateStyle({ 
                 shadow: { 
-                  color: shape.style.shadow?.color || '#000000',
-                  blur: shape.style.shadow?.blur || 0,
-                  offsetX: shape.style.shadow?.offsetX || 0,
+                  color: shape.style?.shadow?.color || '#000000',
+                  blur: shape.style?.shadow?.blur || 0,
+                  offsetX: shape.style?.shadow?.offsetX || 0,
                   offsetY: Number(e.target.value)
                 } 
               })}

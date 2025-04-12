@@ -4,9 +4,9 @@ import { getIconById } from '@utils/IconLoader';
 interface LayerPanelProps {
   shapes: ZentrixShape[];
   selectedShapeId: string | null;
-  onSelectShape: (id: string) => void;
-  onLayerOrderChange: (id: string, direction: 'up' | 'down') => void;
-  onShapeVisibilityToggle: (id: string) => void;
+  onSelectShape: (shapeId: string | null) => void;
+  onLayerOrderChange: (shapeId: string, direction: 'up' | 'down') => void;
+  onShapeVisibilityToggle: (shapeId: string) => void;
 }
 
 const LayerPanel: React.FC<LayerPanelProps> = ({
@@ -16,19 +16,25 @@ const LayerPanel: React.FC<LayerPanelProps> = ({
   onLayerOrderChange,
   onShapeVisibilityToggle
 }) => {
+  const handleLayerClick = (shapeId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // 이벤트 객체와 함께 전달
+    onSelectShape(shapeId);
+  };
+
   return (
-    <div className="layer-panel">
-      <div className="panel-header">
-        <h3 className="panel-title">레이어</h3>
-      </div>
-      <div className="layer-panel-content">
-        <div className="layer-list">
-          {shapes.map((shape, index) => (
-            <div
-              key={shape.id}
-              className={`layer-item ${selectedShapeId === shape.id ? 'selected' : ''}`}
-              onClick={() => onSelectShape(shape.id)}
-            >
+    <div className="ui-panel layer-panel">
+      <h2 className="panel-title">레이어</h2>
+      <div className="layer-list">
+        {shapes.map(shape => (
+          <div
+            key={shape.id}
+            className={`layer-item ${selectedShapeId === shape.id ? 'selected' : ''}`}
+            onClick={(e) => handleLayerClick(shape.id, e)}
+          >
+            <div className="layer-content">
               <button
                 className="visibility-toggle"
                 onClick={(e) => {
@@ -36,48 +42,34 @@ const LayerPanel: React.FC<LayerPanelProps> = ({
                   onShapeVisibilityToggle(shape.id);
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
-                    fill="currentColor"
-                  />
-                </svg>
+                <i className={`icon ${shape.style?.opacity === 0 ? 'hidden' : 'visible'}`} />
               </button>
-
-              <div className="layer-info">
-                <span className="shape-icon" dangerouslySetInnerHTML={{ 
-                  __html: getIconById(shape.type)?.svg || '' 
-                }} />
-                <span className="shape-name">
-                  {shape.type} {index + 1}
-                </span>
-              </div>
-
-              <div className="layer-controls">
-                <button
-                  className="layer-button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onLayerOrderChange(shape.id, 'up');
-                  }}
-                  disabled={index === shapes.length - 1}
-                >
-                  ↑
-                </button>
-                <button
-                  className="layer-button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onLayerOrderChange(shape.id, 'down');
-                  }}
-                  disabled={index === 0}
-                >
-                  ↓
-                </button>
-              </div>
+              <span className="layer-name">
+                {shape.type === 'group' ? '그룹' : shape.type} {shape.id.slice(0, 4)}
+              </span>
             </div>
-          ))}
-        </div>
+            <div className="layer-controls">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLayerOrderChange(shape.id, 'up');
+                }}
+                disabled={shapes.indexOf(shape) === shapes.length - 1}
+              >
+                ↑
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLayerOrderChange(shape.id, 'down');
+                }}
+                disabled={shapes.indexOf(shape) === 0}
+              >
+                ↓
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

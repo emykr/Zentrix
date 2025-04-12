@@ -31,14 +31,44 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
       }
     };
 
+    const preventDefaultContext = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
     document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener('contextmenu', preventDefaultContext);
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('contextmenu', preventDefaultContext);
+    };
   }, [onClose]);
+
+  // 화면 경계를 벗어나지 않도록 위치 조정
+  const adjustedPosition = React.useMemo(() => {
+    const menuWidth = 200; // 최소 메뉴 너비
+    const menuHeight = items.length * 36; // 대략적인 메뉴 높이
+    
+    let adjustedX = x;
+    let adjustedY = y;
+    
+    // 우측 경계 체크
+    if (x + menuWidth > window.innerWidth) {
+      adjustedX = window.innerWidth - menuWidth - 10;
+    }
+    
+    // 하단 경계 체크
+    if (y + menuHeight > window.innerHeight) {
+      adjustedY = window.innerHeight - menuHeight - 10;
+    }
+    
+    return { x: adjustedX, y: adjustedY };
+  }, [x, y, items.length]);
 
   return (
     <div
-      className="context-menu fixed bg-slate-800/95 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 py-1 min-w-[200px]"
-      style={{ left: x, top: y }}
+      className="context-menu fixed bg-slate-800/95 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 py-1 min-w-[200px] z-50"
+      style={{ left: adjustedPosition.x, top: adjustedPosition.y }}
     >
       {items.map((item, index) => (
         <React.Fragment key={item.id}>

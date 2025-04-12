@@ -2,15 +2,22 @@
   "button": {
     "start": "Start",
     "close": "Close",
-    "retry": "Retry"
+    "retry": "Retry",
+    "selectAll": "Select All",
+    "deselect": "Deselect",
+    "continue": "Continue"
   },
   "common": {
     "loading": "Loading...",
-    "initialized": "Initialization Complete"
+    "initialized": "Initialization Complete",
+    "newDesign": "New Design",
+    "enterTitle": "Please enter a title",
+    "enterText": "Please enter text"
   },
   "error": {
     "initialization": "Initialization Error",
-    "unknown": "An unknown error occurred"
+    "unknown": "An unknown error occurred",
+    "titleRequired": "Title is required"
   },
   "bootstrap": {
     "title": "System Bootstrap",
@@ -19,5 +26,22 @@
     "loading": "Loading components...",
     "complete": "Bootstrap complete",
     "error": "Bootstrap failed"
+  },
+  "menu": {
+    "file": {
+      "new": "New",
+      "open": "Open",
+      "save": "Save",
+      "saveAs": "Save As",
+      "export": "Export"
+    }
+  },
+  "dialog": {
+    "newDesign": {
+      "title": "Create New Design",
+      "enterTitle": "Enter design title",
+      "create": "Create",
+      "cancel": "Cancel"
+    }
   }
 }
